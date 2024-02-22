@@ -2,11 +2,19 @@ import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import LogoImg from "../../assets/images/logo.svg";
+// @ts-ignore
+import { loginWithRedirect, handleRedirectCallback } from "@myorg/authn";
 
 export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const baseUrl = `${window.location.protocol}//${window.location.host}`;
 
-  console.log("Image", LogoImg);
+  if (window.location.search.includes("state=")) {
+    (async () => {
+      const redirectResult = await handleRedirectCallback();
+      window.location.replace(redirectResult.appState.targetUrl);
+    })();
+  }
 
   return (
     <div className="bg-white">
@@ -32,12 +40,21 @@ export default function Landing() {
             </button>
           </div>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            <a
-              href="/api/auth/login"
+            <button
+              onClick={() =>
+                loginWithRedirect({
+                  authorizationParams: {
+                    redirect_uri: baseUrl,
+                  },
+                  appState: {
+                    targetUrl: "/home",
+                  },
+                })
+              }
               className="text-sm font-semibold leading-6 text-gray-900"
             >
               Log in <span aria-hidden="true">&rarr;</span>
-            </a>
+            </button>
           </div>
         </nav>
         <Dialog
@@ -65,12 +82,21 @@ export default function Landing() {
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10">
                 <div className="py-6">
-                  <a
-                    href="/api/auth/login"
+                  <button
+                    onClick={() =>
+                      loginWithRedirect({
+                        authorizationParams: {
+                          redirect_uri: baseUrl,
+                        },
+                        appState: {
+                          targetUrl: "/home",
+                        },
+                      })
+                    }
                     className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                   >
                     Log in
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
